@@ -2,9 +2,9 @@ package mongodb
 
 import (
 	"context"
-	"log"
 	"time"
 
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -31,10 +31,32 @@ func Connect(url string) (*Mongodb, error) {
 func (db *Mongodb) Create(ctx context.Context, database, table string, entity interface{}) error {
 	_, err := db.client.Database(database).Collection(table).InsertOne(ctx, entity)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	return nil
 }
-func (db *Mongodb) Get(ctx context.Context, entityId string) (interface{}, error) { return nil, nil }
-func (db *Mongodb) Update(ctx context.Context, enitty string) error               { return nil }
-func (db *Mongodb) Delete(ctx context.Context, entityId string) error             { return nil }
+
+func (db *Mongodb) GetByID(ctx context.Context, database, table string, entityId string, entity interface{}) error {
+	query := bson.D{{Key: "_id", Value: entityId}}
+	cursor := db.client.Database(database).Collection(table).FindOne(ctx, query)
+	err := cursor.Decode(entity)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (db *Mongodb) GetAll(ctx context.Context, database, table string, entities interface{}) error {
+	query := bson.D{{}}
+	cursor, err := db.client.Database(database).Collection(table).Find(ctx, query)
+	if err != nil {
+		return err
+	}
+	if err := cursor.All(ctx, entities); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (db *Mongodb) Update(ctx context.Context, enitty string) error   { return nil }
+func (db *Mongodb) Delete(ctx context.Context, entityId string) error { return nil }
