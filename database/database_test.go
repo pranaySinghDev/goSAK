@@ -64,7 +64,7 @@ func TestGetAllDBEntity(t *testing.T) {
 		log.Fatalf("Couldn't build database Factory: %v", err)
 	}
 	var Users []User = make([]User, 0)
-	err = db.GetAll(context.Background(), "awesomeApp", "users", &Users)
+	err = db.GetAll(context.Background(), "awesomeApp", "users", &Users, 10, 1)
 	if err != nil {
 		log.Fatalf("Couldn't get all: %v", err)
 	}

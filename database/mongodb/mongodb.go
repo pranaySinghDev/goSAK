@@ -46,9 +46,18 @@ func (db *Mongodb) GetByID(ctx context.Context, database, table string, entityId
 	return nil
 }
 
-func (db *Mongodb) GetAll(ctx context.Context, database, table string, entities interface{}) error {
+func (db *Mongodb) GetAll(ctx context.Context, database, table string, entities interface{}, limit int64, index int64) error {
 	query := bson.D{{}}
-	cursor, err := db.client.Database(database).Collection(table).Find(ctx, query)
+	var findoptions *options.FindOptions
+	skip := limit * index
+	if limit > 0 {
+		findoptions = &options.FindOptions{
+			Limit: &limit,
+			Skip:  &skip,
+		}
+	}
+
+	cursor, err := db.client.Database(database).Collection(table).Find(ctx, query, findoptions)
 	if err != nil {
 		return err
 	}
