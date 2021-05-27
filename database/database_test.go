@@ -5,7 +5,6 @@ import (
 	"log"
 	"testing"
 
-	guuid "github.com/google/uuid"
 	"github.com/pranaySinghDev/goSAK/database/config"
 )
 
@@ -29,15 +28,15 @@ func TestInsertDBEntity(t *testing.T) {
 		log.Fatalf("Couldn't build database Factory: %v", err)
 	}
 	entity := &User{
-		ID:      guuid.New().String(),
 		Name:    "Jay",
 		Product: "Item2",
 		Age:     45,
 	}
-	err = db.Create(context.Background(), "awesomeApp", "users", entity)
+	id, err := db.Create(context.Background(), "awesomeApp", "users", entity)
 	if err != nil {
 		log.Fatalf("Couldn't insert into database: %v", err)
 	}
+	log.Printf("id %s", id)
 }
 
 func TestGetDBEntityByID(t *testing.T) {
@@ -49,7 +48,7 @@ func TestGetDBEntityByID(t *testing.T) {
 		log.Fatalf("Couldn't build database Factory: %v", err)
 	}
 	entity := &User{}
-	err = db.GetByID(context.Background(), "awesomeApp", "users", "2e0ce5b6-7b90-4bf6-9cde-8dd6734ec6c4", entity)
+	err = db.GetByID(context.Background(), "awesomeApp", "users", "60af6f6c35dc24af5e3897ec", entity)
 	if err != nil {
 		log.Fatalf("Couldn't get by id: %v", err)
 	}

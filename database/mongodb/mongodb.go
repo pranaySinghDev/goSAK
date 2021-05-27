@@ -2,9 +2,11 @@ package mongodb
 
 import (
 	"context"
+	"errors"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -28,18 +30,27 @@ func Connect(url string) (*Mongodb, error) {
 
 }
 
-func (db *Mongodb) Create(ctx context.Context, database, table string, entity interface{}) error {
-	_, err := db.client.Database(database).Collection(table).InsertOne(ctx, entity)
+func (db *Mongodb) Create(ctx context.Context, database, table string, entity interface{}) (string, error) {
+	insertResult, err := db.client.Database(database).Collection(table).InsertOne(ctx, entity)
 	if err != nil {
-		return err
+		return "", err
 	}
-	return nil
+	oid, ok := insertResult.InsertedID.(primitive.ObjectID)
+	if !ok {
+		return "", errors.New("Couldn't parse the data")
+	}
+	id := oid.Hex()
+	return id, nil
 }
 
 func (db *Mongodb) GetByID(ctx context.Context, database, table string, entityId string, entity interface{}) error {
-	query := bson.D{{Key: "_id", Value: entityId}}
+	docID, err := primitive.ObjectIDFromHex(entityId)
+	if err != nil {
+		return err
+	}
+	query := bson.M{"_id": docID}
 	cursor := db.client.Database(database).Collection(table).FindOne(ctx, query)
-	err := cursor.Decode(entity)
+	err = cursor.Decode(entity)
 	if err != nil {
 		return err
 	}
