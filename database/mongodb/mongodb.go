@@ -16,8 +16,8 @@ type Mongodb struct {
 }
 
 //Return db connection
-func Connect(url string) (*Mongodb, error) {
-	client, err := mongo.NewClient(options.Client().ApplyURI(url))
+func Connect(url string, maxPool, minPool uint64) (*Mongodb, error) {
+	client, err := mongo.NewClient(options.Client().ApplyURI(url), options.Client().SetMaxPoolSize(maxPool), options.Client().SetMinPoolSize(maxPool))
 	if err != nil {
 		return nil, err
 	}
