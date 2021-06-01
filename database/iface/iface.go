@@ -8,4 +8,5 @@ type IDatabase interface {
 	GetAll(ctx context.Context, database, table string, entities interface{}, limit int64, index int64) error
 	Update(ctx context.Context, enitty string) error
 	Delete(ctx context.Context, entityId string) error
+	Disconnect(ctx context.Context) error
 }

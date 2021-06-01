@@ -20,6 +20,7 @@ const (
 )
 
 func TestInsertDBEntity(t *testing.T) {
+	ctx := context.Background()
 	db, err := Build(&config.DBConfig{
 		Type: config.Mongodb,
 		URL:  url,
@@ -29,14 +30,15 @@ func TestInsertDBEntity(t *testing.T) {
 	}
 	entity := &User{
 		Name:    "Jay",
-		Product: "Item2",
+		Product: "60b5e270e787e76051de9626",
 		Age:     45,
 	}
-	id, err := db.Create(context.Background(), "awesomeApp", "users", entity)
+	id, err := db.Create(ctx, "awesomeApp", "users", entity)
 	if err != nil {
 		log.Fatalf("Couldn't insert into database: %v", err)
 	}
 	log.Printf("id %s", id)
+	db.Disconnect(ctx)
 }
 
 func TestGetDBEntityByID(t *testing.T) {

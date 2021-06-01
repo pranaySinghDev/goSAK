@@ -29,7 +29,9 @@ func Connect(url string) (*Mongodb, error) {
 	return &Mongodb{client}, nil
 
 }
-
+func (db *Mongodb) Disconnect(ctx context.Context) error {
+	return db.client.Disconnect(ctx)
+}
 func (db *Mongodb) Create(ctx context.Context, database, table string, entity interface{}) (string, error) {
 	insertResult, err := db.client.Database(database).Collection(table).InsertOne(ctx, entity)
 	if err != nil {
@@ -75,6 +77,7 @@ func (db *Mongodb) GetAll(ctx context.Context, database, table string, entities 
 	if err := cursor.All(ctx, entities); err != nil {
 		return err
 	}
+	defer cursor.Close(ctx)
 	return nil
 }
 
