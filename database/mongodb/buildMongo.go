@@ -10,7 +10,7 @@ type MongoFactory struct{}
 // build mongodb
 func (f *MongoFactory) Build(config *config.DBConfig) (iface.IDatabase, error) {
 	//standard configuration
-	db, err := Connect(config.URL)
+	db, err := Connect(config.URL, config.MaxPool, config.MaxPool)
 	if err != nil {
 		return nil, err
 	}
